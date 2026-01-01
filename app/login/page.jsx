@@ -1,5 +1,7 @@
 "use client";
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
