@@ -1,4 +1,5 @@
 "use client";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -56,15 +57,18 @@ export default function LoginPage() {
       // Determine API endpoint based on user type
       switch (userType) {
         case "institution":
-          endpoint = "http://localhost:5000/api/auth/institution/login";
+          endpoint = `${API_BASE}/api/auth/institution/login`;
+
           payload = { email, password };
           break;
         case "teacher":
-          endpoint = "http://localhost:5000/api/auth/teacher/login";
+          endpoint = `${API_BASE}/api/auth/teacher/login`;
+
           payload = { email, password, institutionCode };
           break;
         case "student":
-          endpoint = "http://localhost:5000/api/auth/student/login";
+          endpoint = `${API_BASE}/api/auth/student/login`;
+
           payload = { email, password, institutionCode };
           break;
         default:
