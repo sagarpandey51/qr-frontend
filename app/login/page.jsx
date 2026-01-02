@@ -1,5 +1,10 @@
 "use client";
 import API_BASE_URL from "../api";
+
+useEffect(() => {
+  console.log("API_BASE_URL:", API_BASE_URL);
+}, []);
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
