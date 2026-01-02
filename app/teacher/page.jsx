@@ -1,4 +1,5 @@
 "use client";
+import API_BASE_URL from "@/app/api";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -115,8 +116,8 @@ export default function TeacherPage() {
   const fetchTeacherData = async (teacherId, token) => {
     try {
       setLoadingTeacherData(true);
-      const res = await fetch(
-        `http://localhost:5000/api/teachers/profile`,
+      const res = awaitfetch(`${API_BASE_URL}/api/teachers/profile`
+,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -181,7 +182,7 @@ export default function TeacherPage() {
   const updateProfile = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/teachers/profile`,
+        `${API_BASE_URL}/api/teachers/profile`,
         {
           method: 'PUT',
           headers: {
@@ -211,8 +212,7 @@ export default function TeacherPage() {
     try {
       setLoadingAttendance(true);
       const res = await fetch(
-        `http://localhost:5000/api/attendance/class-attendance`,
-        {
+        `${API_BASE_URL}/api/attendance/class-attendance`,{
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -343,7 +343,7 @@ export default function TeacherPage() {
     
     try {
       const res = await fetch(
-        "http://localhost:5000/api/qr/generate",
+        `${API_BASE_URL}/api/qr/generate`,
         {
           method: "POST",
           headers: {
@@ -444,8 +444,7 @@ export default function TeacherPage() {
     try {
       // Mark attendance via API
       const res = await fetch(
-        "http://localhost:5000/api/attendance/mark",
-        {
+        `${API_BASE_URL}/api/attendance/mark`,{
           method: "POST",
           headers: {
             "Content-Type": "application/json",

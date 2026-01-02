@@ -1,4 +1,5 @@
 "use client";
+import API_BASE_URL from "../../api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
@@ -71,12 +72,17 @@ export default function AdminDashboard() {
         }
 
         // Fetch dashboard stats
-        const dashboardRes = await fetch("http://localhost:5000/api/institution/dashboard", {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        });
+        const dashboardRes = await fetch(
+  `${API_BASE_URL}/api/institution/dashboard`
+,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  }
+);
+
 
         if (dashboardRes.status === 401) {
           localStorage.clear();
@@ -92,7 +98,8 @@ export default function AdminDashboard() {
         }
 
         // Fetch students for top courses
-        const studentsRes = await fetch("http://localhost:5000/api/institution/students", {
+        const studentsRes = await fetch(`${API_BASE_URL}/api/institution/students`,
+{
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"

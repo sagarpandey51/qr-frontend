@@ -1,4 +1,5 @@
 "use client";
+import API_BASE_URL from "../../api";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -94,7 +95,8 @@ export default function StudentPage() {
   const fetchStudentData = async (studentId, token) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/students/profile`,
+        fetch(`${API_BASE_URL}/api/students/profile`)
+,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -133,67 +135,74 @@ export default function StudentPage() {
   };
 
   // Update student profile
-  const updateProfile = async () => {
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/students/profile`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(editForm)
-        }
-      );
-      
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setStudentData(data.data);
-        setEditingProfile(false);
-        setMessage("✅ Profile updated successfully!");
-      } else {
-        setMessage(`❌ ${data.message || 'Failed to update profile'}`);
+const updateProfile = async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/api/students/profile`,
+      {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(editForm)
       }
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      setMessage("❌ Error updating profile");
+    );
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Profile update failed");
     }
-  };
+
+    setStudentData(data.data);
+    setEditingProfile(false);
+    setMessage("✅ Profile updated successfully!");
+
+  } catch (error) {
+    console.error("Profile update error:", error);
+    setMessage("❌ Failed to update profile");
+  }
+};
+
 
   // Fetch attendance records from API
   const fetchAttendanceRecords = async (studentId, token) => {
-    try {
-      setLoadingAttendance(true);
-      const res = await fetch(
-        `http://localhost:5000/api/attendance/my-attendance`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-        }
-      );
+  try {
+    setLoadingAttendance(true);
 
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setAttendanceRecords(data.data.attendance || []);
-        setFilteredRecords(data.data.attendance || []);
-        calculateSubjectStats(data.data.attendance || []);
-        calculateOverallStats(data.data.attendance || []);
-      } else {
-        console.error("Failed to fetch attendance records:", data.message);
-        setAttendanceRecords([]);
-        setFilteredRecords([]);
+    const res = await fetch(
+      `${API_BASE_URL}/api/attendance/my-attendance`,
+      {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
       }
-    } catch (error) {
-      console.error("Error fetching attendance:", error);
+    );
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      const attendance = data.data.attendance || [];
+      setAttendanceRecords(attendance);
+      setFilteredRecords(attendance);
+      calculateSubjectStats(attendance);
+      calculateOverallStats(attendance);
+    } else {
+      console.error("Failed to fetch attendance records:", data.message);
       setAttendanceRecords([]);
       setFilteredRecords([]);
-    } finally {
-      setLoadingAttendance(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching attendance:", error);
+    setAttendanceRecords([]);
+    setFilteredRecords([]);
+  } finally {
+    setLoadingAttendance(false);
+  }
+};
 
   // Calculate subject-wise statistics
   const calculateSubjectStats = (records) => {
@@ -306,8 +315,8 @@ export default function StudentPage() {
 
           // Mark attendance via API
           try {
-            const res = await fetch(
-              "http://localhost:5000/api/attendance/mark",
+            const res = await fetch(`${API_BASE_URL}/api/attendance/mark`,
+
               {
                 method: "POST",
                 headers: {

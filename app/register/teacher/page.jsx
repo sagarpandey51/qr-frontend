@@ -1,4 +1,5 @@
 "use client";
+import API_BASE_URL from "../../api";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -81,7 +82,8 @@ export default function TeacherRegister() {
         .filter(subject => subject.length > 0);
 
       const res = await fetch(
-         "http://localhost:5000/api/teachers/register",
+         `${API_BASE_URL}/api/teachers/register`
+,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

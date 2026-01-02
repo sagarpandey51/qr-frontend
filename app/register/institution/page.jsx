@@ -1,4 +1,5 @@
 "use client";
+import API_BASE_URL from "../../api";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -96,7 +97,8 @@ export default function InstitutionRegister() {
     setIsSubmitting(true);
     try {
       const res = await fetch(
-        "http://localhost:5000/api/auth/institution/register",
+        `${API_BASE_URL}/api/auth/institution/register`
+,
         {
           method: "POST",
           headers: { 
