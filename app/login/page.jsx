@@ -1,9 +1,7 @@
 "use client";
 import API_BASE_URL from "../api";
 
-useEffect(() => {
-  console.log("API_BASE_URL:", API_BASE_URL);
-}, []);
+
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -30,6 +28,9 @@ export default function LoginPage() {
   const router = useRouter();
 
   // Generate floating cyber particles
+  useEffect(() => {
+  console.log("API_BASE_URL:", API_BASE_URL);
+}, []);
   useEffect(() => {
     const particlesArray = Array.from({ length: 40 }, (_, i) => ({
       id: i,
