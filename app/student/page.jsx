@@ -96,7 +96,7 @@ export default function StudentPage() {
   const fetchStudentData = async (studentId, token) => {
     try {
       const res = await fetch(
-        fetch(`${API_BASE_URL}/api/students/profile`)
+        `${API_BASE_URL}/api/students/profile`
 ,
         {
           headers: {
@@ -292,67 +292,71 @@ const updateProfile = async () => {
   }
 
   // 📷 Start QR Scanner
-  const startScanner = async () => {
-    if (scanner) return;
+const startScanner = async () => {
+  if (scanner) return;
 
-    setLoading(true);
-    setMessage("");
-    const qrScanner = new Html5Qrcode("reader");
-    setScanner(qrScanner);
+  setLoading(true);
+  setMessage("");
 
-    try {
-      await qrScanner.start(
-        { facingMode: "environment" },
-        { 
-          fps: 10, 
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0
-        },
-        async (qrToken) => {
-          setScanResult(qrToken);
-          await qrScanner.stop();
-          setScanner(null);
+  const qrScanner = new Html5Qrcode("reader");
+  setScanner(qrScanner);
+
+  try {
+    await qrScanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+
+      async (decodedText) => {
+        await qrScanner.stop();
+        setScanner(null);
+
+        let parsedQR;
+        try {
+          parsedQR = JSON.parse(decodedText);
+        } catch {
           setLoading(false);
-
-          // Mark attendance via API
-          try {
-            const res = await fetch(`${API_BASE_URL}/api/attendance/mark`,
-
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                  qrToken: qrToken,
-                }),
-              }
-            );
-
-            const data = await res.json();
-            if (res.ok && data.success) {
-              setMessage(`✅ ${data.message}`);
-              // Refresh attendance records
-              fetchAttendanceRecords(studentId, token);
-            } else {
-              setMessage(`❌ ${data.message || 'Failed to mark attendance'}`);
-            }
-          } catch (error) {
-            console.error("Error marking attendance:", error);
-            setMessage("❌ Error processing attendance");
-          }
-        },
-        (error) => {
-          console.error("QR scan error:", error);
+          setMessage("❌ Invalid QR code");
+          return;
         }
-      );
-    } catch (err) {
-      console.error("Scanner error:", err);
-      setLoading(false);
-      setMessage("❌ Failed to start scanner. Please check camera permissions.");
-    }
-  };
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/attendance/mark`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(parsedQR) // ✅ send full QR payload
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            setMessage(`✅ ${data.message}`);
+            fetchAttendanceRecords(studentId, token);
+          } else {
+            setMessage(`❌ ${data.message || "Attendance failed"}`);
+          }
+        } catch (err) {
+          console.error("Attendance error:", err);
+          setMessage("❌ Server error while marking attendance");
+        } finally {
+          setLoading(false);
+        }
+      },
+
+      (scanError) => {
+        // Ignore scan noise
+        // console.log(scanError);
+      }
+    );
+  } catch (err) {
+    console.error("Scanner error:", err);
+    setLoading(false);
+    setMessage("❌ Camera permission denied or scanner error");
+  }
+};
+
 
   const stopScanner = async () => {
     if (scanner) {
